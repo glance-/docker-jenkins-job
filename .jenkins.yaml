@@ -1,10 +1,12 @@
 triggers:
-  github_push: true  
+  github_push: true
   cron: "@daily"
 clean_workspace: true
 
-extra_jobs:  
+extra_jobs:
   - name: docker-jenkins-maven-job
     docker_name: sunet/docker-jenkins-maven-job
     docker_context_dir: maven
-    
+  - name: docker-jenkins-node-job
+    docker_name: sunet/docker-jenkins-node-job
+    docker_context_dir: node
