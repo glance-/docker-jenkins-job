@@ -10,3 +10,6 @@ extra_jobs:
   - name: docker-jenkins-node-job
     docker_name: sunet/docker-jenkins-node-job
     docker_context_dir: node
+  - name: docker-jenkins-golang-job
+    docker_name: sunet/docker-jenkins-golang-job
+    docker_context_dir: golang
