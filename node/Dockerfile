@@ -22,7 +22,7 @@ RUN apt-get install -y \
     libasound2 \
     libatk1.0-0 \
     libgtk-3-0
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get clean
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
