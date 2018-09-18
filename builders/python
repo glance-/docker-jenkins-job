@@ -95,7 +95,7 @@ sloccount --duplicates --wide --details ${srcdir} > sloccount.sc
 rm -rf $VIRTUAL_ENV
 # show files likely to be copied to pypi.sunet.se
 echo "Resulting artifacts :"
-ls -l dist/*.tar.gz dist/*.egg || ls -l
+ls -l dist/*.tar.gz dist/*.egg dist/*.whl || ls -l
 
 # for debugging missing coverage data
 find . -name coverage.xml -ls
