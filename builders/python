@@ -59,7 +59,9 @@ python ./setup.py develop --index-url https://pypi.sunet.se/simple --allow-hosts
 # compile language files if project has a 'locale' directory
 test -d */locale && python setup.py compile_catalog
 test -d */locale && find */locale -type f -ls
-python ./setup.py sdist bdist_wheel install
+python ./setup.py sdist
+python ./setup.py bdist_wheel --universal
+python ./setup.py install
 test -f setup.cfg && grep -q testing setup.cfg && python ./setup.py testing
 
 pip install nose nosexcover pylint
