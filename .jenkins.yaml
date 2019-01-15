@@ -13,3 +13,6 @@ extra_jobs:
   - name: docker-jenkins-golang-job
     docker_name: sunet/docker-jenkins-golang-job
     docker_context_dir: golang
+  - name: docker-jenkins-job-xenial
+    docker_name: sunet/docker-jenkins-job-xenial
+    docker_context_dir: xenial
