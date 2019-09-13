@@ -1,0 +1,3 @@
+FROM docker.sunet.se/jenkins-job
+# Hack out docker push
+COPY --chown=root:root docker-push-wrapper /usr/local/bin/docker

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ "$1" = "push" ] ; then
+	echo "Wrapper turned push into NOP"
+	exit 0
+else
+	exec /usr/bin/docker "$@"
+fi

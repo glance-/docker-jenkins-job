@@ -1,0 +1,7 @@
+docker-push-wrapper is a wrapper which turns docker push into a NOP
+
+This is usefull for testing end-to-end, where you don't want your images
+to end up at the repository, but you don't want to alter the build jobs.
+
+This is built by:
+make DOCKERFILE=Dockerfile.docker-push-wrapper update
