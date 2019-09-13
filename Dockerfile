@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 MAINTAINER Leif Johansson <leifj@mnt.se>
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-RUN /bin/sed -i s/deb.debian.org/ftp.se.debian.org/g /etc/apt/sources.list
+RUN /bin/sed -i s/archive.ubuntu.com/se.archive.ubuntu.com/g /etc/apt/sources.list
 RUN apt-get -q update
 RUN apt-get install -y software-properties-common
 RUN apt-get -y upgrade
