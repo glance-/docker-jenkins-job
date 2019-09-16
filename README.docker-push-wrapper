@@ -5,3 +5,6 @@ to end up at the repository, but you don't want to alter the build jobs.
 
 This is built by:
 make DOCKERFILE=Dockerfile.docker-push-wrapper update
+
+and for the extra_jobs:
+make DOCKERFILE=../Dockerfile.docker-push-wrapper update_extra_jobs
