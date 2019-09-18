@@ -42,8 +42,7 @@ export PIP_INDEX_URL=https://pypi.sunet.se/simple/
 
 python --version
 
-# Use setuptools<40 until namespace bug is fixed
-pip install -U "setuptools<40"
+pip install -U setuptools
 pip install -U pip
 
 test -f requirements.txt && pip install --pre -r requirements.txt
