@@ -60,7 +60,9 @@ test -d */locale && python setup.py compile_catalog
 test -d */locale && find */locale -type f -ls
 python ./setup.py sdist
 python ./setup.py bdist_wheel --universal
-python ./setup.py install
+# Don't do both develop and install
+# if package is zip_safe=True , it will break pip because it gets confused when the source dir is replaced by a zip file
+#python ./setup.py install
 test -f setup.cfg && grep -q testing setup.cfg && python ./setup.py testing
 
 pip install nose nosexcover pylint
