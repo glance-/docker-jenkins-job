@@ -3,12 +3,13 @@
 set -x
 set -eE
 
-TMP=`pwd`/"tmp_${BUILD_NUMBER}"
-mkdir -p $TMP
+TMP="$PWD/tmp_${BUILD_NUMBER}"
+mkdir -p "$TMP"
 TMPDIR=$TMP
 TEMP=$TMP
 export TMP TEMP TMPDIR
 
+# shellcheck disable=SC2064
 trap "rm -rf $TMP" ERR
 
 
@@ -17,8 +18,10 @@ env
 git status
 ls -l
 
-test "x$package" = "x" && package="`echo $1 | sed 's/-/_/g'`"
-test "x$srcdir" = "x" && srcdir="`echo $2 | sed 's/-/_/g'`"
+#test "x$package" = "x" && package="$(echo "$1"| sed 's/-/_/g')"
+test "x$package" = "x" && package="${1//-/_}"
+#test "x$srcdir" = "x" && srcdir="$(echo "$2" | sed 's/-/_/g')"
+test "x$srcdir" = "x" && srcdir="${2//-/_}"
 test "x$testworkdir" = "x" && testworkdir="$3"
 test "x$testworkdir" = "x" && testworkdir="$WORKSPACE"
 
@@ -32,13 +35,14 @@ if [ "x$srcdir" = "x" ]; then
   exit 1
 fi
 
-cd $WORKSPACE
+cd "$WORKSPACE"
 export VIRTUAL_ENV="$WORKSPACE/venv_${BUILD_NUMBER}"
-virtualenv --no-site-packages $VIRTUAL_ENV
+virtualenv --no-site-packages "$VIRTUAL_ENV"
 export PIP_DOWNLOAD_CACHE=/var/cache/jenkins/pip
 export PIP_INDEX_URL=https://pypi.sunet.se/simple/
 
-. $VIRTUAL_ENV/bin/activate
+# shellcheck disable=SC1090
+. "$VIRTUAL_ENV/bin/activate"
 
 python --version
 
@@ -54,10 +58,10 @@ test -f tests/test_requirements.txt && pip install --pre -r tests/test_requireme
 # By white listing pypi.sunet.se and pypi.python.org we forbidd easy_install
 # to fetch package from very slow servers like the one from python-dateutil
 # Easy_install tries to do that in order to look if there are newer versions
-python ./setup.py develop --index-url https://pypi.sunet.se/simple --allow-hosts *.sunet.se,*.python.org,*.github.com,*.launchpad.net,*.cherrypy.org,*.sf.net,*.sourceforge.net,*.pythonhosted.org
+python ./setup.py develop --index-url https://pypi.sunet.se/simple --allow-hosts '*.sunet.se,*.python.org,*.github.com,*.launchpad.net,*.cherrypy.org,*.sf.net,*.sourceforge.net,*.pythonhosted.org'
 # compile language files if project has a 'locale' directory
-test -d */locale && python setup.py compile_catalog
-test -d */locale && find */locale -type f -ls
+test -d ./*/locale && python setup.py compile_catalog
+test -d ./*/locale && find ./*/locale -type f -ls
 python ./setup.py sdist
 python ./setup.py bdist_wheel --universal
 # Don't do both develop and install
@@ -71,10 +75,10 @@ pip install nose nosexcover pylint
 pip freeze
 
 rm -f nosetests.xml
-rm -f */nosetests.xml
+rm -f ./*/nosetests.xml
 
 # Change to another directory if testworkdir is set to something other than $WORKSPACE so that nosetest test tests installed code
-cd $testworkdir
+cd "$testworkdir"
 
 if [ "$package" = "saml2" ]; then
   py.test tests
@@ -115,20 +119,22 @@ else
       ;;
   esac
   # To get test_requre and so on.
+  # yea, we want SUITE to expand here, so it can turn into zero or multiple arguments
+  # shellcheck disable=SC2086
   python setup.py nosetests --with-xunit --xunit-file=nosetests.xml --with-xcoverage --cover-xml --cover-xml-file=coverage.xml --cover-package=${COV_PACKAGE} --cover-erase $SUITE
 fi
 
-cd $WORKSPACE
+cd "$WORKSPACE"
 
-pylint -f parseable ${package} | tee pylint.out
+pylint -f parseable "${package}" | tee pylint.out
 ls -l pylint.out || true
 # eduid-dashboard has strange directory layout... oh my, what a hack.
-grep -q "No module named ${package}" pylint.out && pylint -f parseable ${srcdir} | tee pylint.out
+grep -q "No module named ${package}" pylint.out && pylint -f parseable "${srcdir}" | tee pylint.out
 sed -i 's%/opt/work/%%' pylint.out
 
-sloccount --duplicates --wide --details ${srcdir} > sloccount.sc
+sloccount --duplicates --wide --details "${srcdir}" > sloccount.sc
 
-rm -rf $VIRTUAL_ENV
+rm -rf "$VIRTUAL_ENV"
 # show files likely to be copied to pypi.sunet.se
 echo "Resulting artifacts :"
 ls -l dist/*.tar.gz dist/*.egg dist/*.whl || ls -l
