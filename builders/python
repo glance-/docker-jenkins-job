@@ -82,7 +82,40 @@ elif [ "$package" = "eduid_action.mfaXXX" ]; then
   # testing
   nosetests --with-xunit --xunit-file=nosetests.xml --with-xcoverage --cover-xml --cover-xml-file=coverage.xml --cover-package=${package} --cover-erase -w src/eduid_action/mfa/
 else
-  nosetests --with-xunit --xunit-file=nosetests.xml --with-xcoverage --cover-xml --cover-xml-file=coverage.xml --cover-package=${package} --cover-erase ${package}
+  SUITE=
+  COV_PACKAGE=$package
+  case "$package" in
+    stathat.py)
+      touch tests/__init__.py
+      COV_PACKAGE=stathat
+      SUITE="-w tests"
+      ;;
+    stathat_async)
+      COV_PACKAGE=stathatasync
+      ;;
+    python_pyhsm)
+      touch Tests/__init__.py
+      COV_PACKAGE=pyhsm
+      SUITE="-w Tests"
+      ;;
+    proquint)
+      touch src/__init__.py
+      ;;
+    pyscard)
+      COV_PACKAGE=smartcard
+      ;;
+    pycardshare)
+      COV_PACKAGE=cardshare
+      ;;
+    pyriksbankapi)
+      COV_PACKAGE=riksbankapi
+      ;;
+    wsgi_ratelimit)
+      sed -ie 's/with-coverage/with-xcoverage/' setup.cfg
+      ;;
+  esac
+  # To get test_requre and so on.
+  python setup.py nosetests --with-xunit --xunit-file=nosetests.xml --with-xcoverage --cover-xml --cover-xml-file=coverage.xml --cover-package=${COV_PACKAGE} --cover-erase $SUITE
 fi
 
 cd $WORKSPACE
