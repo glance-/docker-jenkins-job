@@ -78,13 +78,13 @@ cd $testworkdir
 
 if [ "$package" = "saml2" ]; then
   py.test tests
-elif [ "$package" = "eduid_action.mfaXXX" ]; then
-  # testing
-  nosetests --with-xunit --xunit-file=nosetests.xml --with-xcoverage --cover-xml --cover-xml-file=coverage.xml --cover-package=${package} --cover-erase -w src/eduid_action/mfa/
 else
   SUITE=
   COV_PACKAGE=$package
   case "$package" in
+    eduid_action.mfaXXX)
+      SUITE="-w src/eduid_action/mfa/"
+      ;;
     stathat.py)
       touch tests/__init__.py
       COV_PACKAGE=stathat
