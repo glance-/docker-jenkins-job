@@ -9,6 +9,7 @@ NO_CACHE=--no-cache=false
 EXTRA_JOBS=$(patsubst %/$(DOCKERFILE),%,$(wildcard */$(DOCKERFILE)))
 
 all: build push
+all_extra_job: build push build_extra_jobs push_extra_jobs
 build:
 	docker build -f $(DOCKERFILE) $(NO_CACHE) $(TAGGINGS) .
 update: NO_CACHE=
