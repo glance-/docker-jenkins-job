@@ -22,11 +22,12 @@ push: $(foreach name,$(NAMES),push_$(name))
 
 # SOURCE_IMAGE build-arg is to be able to overwrite docker with push wrapper
 docker-jenkins-%-job:
+	@# Mangle the name to enable the odd pattern for job-xenial
+	$(eval image_name=$(subst xenial-job,job-xenial,$@))
 	$(eval extra_job=$(patsubst docker-jenkins-%-job,%,$@))
 	@# Trickery to be able to override DOCKERFILE for docker push wrapper
 	$(eval job_dir=$(shell dirname $(extra_job)/$(DOCKERFILE)))
-	docker build --build-arg SOURCE_IMAGE=docker.sunet.se/sunet/$@ -f $(extra_job)/$(DOCKERFILE) $(NO_CACHE) -t docker.sunet.se/sunet/$@ $(job_dir)
-	-[ "$(extra_job)" = "xenial" ] && docker tag docker.sunet.se/sunet/$@ sunet/docker-jenkins-job-xenial
+	docker build --build-arg SOURCE_IMAGE=$(image_name) -f $(extra_job)/$(DOCKERFILE) $(NO_CACHE) -t $(image_name) $(job_dir)
 
 build_extra_jobs: $(foreach extra_job,$(EXTRA_JOBS),docker-jenkins-$(extra_job)-job)
 
