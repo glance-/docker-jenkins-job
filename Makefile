@@ -9,10 +9,23 @@ NO_CACHE=--no-cache=false
 EXTRA_JOBS=$(patsubst %/$(DOCKERFILE),%,$(wildcard */$(DOCKERFILE)))
 
 all: build push
+all_extra_job: build push build_extra_jobs push_extra_jobs
+all_extra_job_docker_wrapper: update update_extra_jobs
+	@# trick to have make "redo" all the targets
+	$(MAKE) update_docker_wrapper update_extra_jobs_docker_wrapper
+
 build:
 	docker build -f $(DOCKERFILE) $(NO_CACHE) $(TAGGINGS) .
+
+build_docker_wrapper: DOCKERFILE=Dockerfile.docker-push-wrapper
+build_docker_wrapper: build
+
 update: NO_CACHE=
 update: build
+
+update_docker_wrapper: DOCKERFILE=Dockerfile.docker-push-wrapper
+update_docker_wrapper: update
+
 # There's some directory search magic going on in make,
 # thats why the part up to the first / is left here.
 push_docker.sunet.se/%:
@@ -36,8 +49,13 @@ docker.sunet.se/%:
 
 build_extra_jobs: $(foreach extra_job,$(EXTRA_JOBS),docker.sunet.se/sunet/docker-jenkins-$(extra_job)-job\:$(VERSION))
 
+build_extra_jobs_docker_wrapper: DOCKERFILE=../Dockerfile.docker-push-wrapper
+build_extra_jobs_docker_wrapper: build_extra_jobs
+
 update_extra_jobs: NO_CACHE=
 update_extra_jobs: build_extra_jobs
 
+update_extra_jobs_docker_wrapper: DOCKERFILE=../Dockerfile.docker-push-wrapper
+update_extra_jobs_docker_wrapper: update_extra_jobs
 
 push_extra_jobs: $(foreach extra_job,$(EXTRA_JOBS),push_docker.sunet.se/sunet/docker-jenkins-$(extra_job)-job\:$(VERSION))
