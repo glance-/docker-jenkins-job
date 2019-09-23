@@ -17,23 +17,24 @@ update: build
 # There's some directory search magic going on in make,
 # thats why the part up to the first / is left here.
 push_docker.sunet.se/%:
-	docker push $(patsubst push_%,%,$@)
+	@# Mangle the name to enable the odd pattern for job-xenial
+	$(eval image_name=$(subst xenial-job,job-xenial,$(patsubst push_%,%,$@)))
+	docker push $(image_name)
 
 push: $(foreach name,$(NAMES),push_$(name))
 
-docker-jenkins-%-job:
+docker.sunet.se/%:
 	@# Mangle the name to enable the odd pattern for job-xenial
 	$(eval image_name=$(subst xenial-job,job-xenial,$@))
-	$(eval extra_job=$(patsubst docker-jenkins-%-job,%,$@))
-	docker build -f $(extra_job)/$(DOCKERFILE) $(NO_CACHE) -t docker.sunet.se/sunet/$(image_name) $(extra_job)
+	@# first, remove any :version from the name,
+	@# and then we can match out the "job-name"
+	@# so we can use that to figure out which context directory to use
+	$(eval extra_job=$(patsubst docker.sunet.se/sunet/docker-jenkins-%-job,%,$(patsubst %:$(lastword $(subst :, ,$@)),%,$@)))
+	docker build -f $(extra_job)/$(DOCKERFILE) $(NO_CACHE) -t $(image_name) $(extra_job)
 
-build_extra_jobs: $(foreach extra_job,$(EXTRA_JOBS),docker-jenkins-$(extra_job)-job)
+build_extra_jobs: $(foreach extra_job,$(EXTRA_JOBS),docker.sunet.se/sunet/docker-jenkins-$(extra_job)-job\:$(VERSION))
 
 update_extra_jobs: NO_CACHE=
 update_extra_jobs: build_extra_jobs
 
-push_docker-jenkins-%-job:
-	$(eval image_name=$(subst xenial-job,job-xenial,$(patsubst push_%,%,$@)))
-	docker push docker.sunet.se/sunet/$(image_name)
-
-push_extra_jobs: $(foreach extra_job,$(EXTRA_JOBS),push_docker-jenkins-$(extra_job)-job)
+push_extra_jobs: $(foreach extra_job,$(EXTRA_JOBS),push_docker.sunet.se/sunet/docker-jenkins-$(extra_job)-job\:$(VERSION))
