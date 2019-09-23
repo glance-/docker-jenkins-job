@@ -2,7 +2,7 @@ VERSION=latest
 NAME=jenkins-job
 DOCKERFILE=Dockerfile
 # This is used with so many different names...
-NAMES=docker.sunet.se/$(NAME):$(VERSION) docker.sunet.se/sunet/$(NAME):$(VERSION) docker.sunet.se/sunet/docker-$(NAME):$(VERSION)
+NAMES=docker.sunet.se/$(NAME)\:$(VERSION) docker.sunet.se/sunet/$(NAME)\:$(VERSION) docker.sunet.se/sunet/docker-$(NAME)\:$(VERSION)
 TAGGINGS=$(foreach name,$(NAMES),-t $(name))
 NO_CACHE=--no-cache=false
 # Subprojects
@@ -13,11 +13,13 @@ build:
 	docker build -f $(DOCKERFILE) $(NO_CACHE) $(TAGGINGS) .
 update: NO_CACHE=
 update: build
-push:
-	set -e ; \
-	for name in $(NAMES) ; do \
-		docker push $$name ; \
-	done
+
+# There's some directory search magic going on in make,
+# thats why the part up to the first / is left here.
+push_docker.sunet.se/%:
+	docker push $(patsubst push_%,%,$@)
+
+push: $(foreach name,$(NAMES),push_$(name))
 
 docker-jenkins-%-job:
 	$(eval extra_job=$(patsubst docker-jenkins-%-job,%,$@))
