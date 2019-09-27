@@ -7,6 +7,7 @@ TAGGINGS=$(foreach name,$(NAMES),-t $(name))
 NO_CACHE=--no-cache=false
 # Subprojects
 EXTRA_JOBS=$(patsubst %/$(DOCKERFILE),%,$(wildcard */$(DOCKERFILE)))
+PULL=
 
 all: build push
 all_extra_job: build push build_extra_jobs push_extra_jobs
@@ -14,8 +15,11 @@ all_extra_job_docker_wrapper: update update_extra_jobs
 	@# trick to have make "redo" all the targets
 	$(MAKE) update_docker_wrapper update_extra_jobs_docker_wrapper
 
+pull:
+	$(eval PULL=--pull)
+
 build:
-	docker build -f $(DOCKERFILE) $(NO_CACHE) $(TAGGINGS) .
+	docker build $(PULL) -f $(DOCKERFILE) $(NO_CACHE) $(TAGGINGS) .
 
 build_docker_wrapper: DOCKERFILE=Dockerfile.docker-push-wrapper
 build_docker_wrapper: build
@@ -45,7 +49,7 @@ docker.sunet.se/%:
 	$(eval extra_job=$(patsubst docker.sunet.se/sunet/docker-jenkins-%-job,%,$(patsubst %:$(lastword $(subst :, ,$@)),%,$@)))
 	@# Trickery to be able to override DOCKERFILE for docker push wrapper
 	$(eval job_dir=$(shell dirname $(extra_job)/$(DOCKERFILE)))
-	docker build --build-arg SOURCE_IMAGE=$(image_name) -f $(extra_job)/$(DOCKERFILE) $(NO_CACHE) -t $(image_name) $(job_dir)
+	docker build $(PULL) --build-arg SOURCE_IMAGE=$(image_name) -f $(extra_job)/$(DOCKERFILE) $(NO_CACHE) -t $(image_name) $(job_dir)
 
 build_extra_jobs: $(foreach extra_job,$(EXTRA_JOBS),docker.sunet.se/sunet/docker-jenkins-$(extra_job)-job\:$(VERSION))
 
