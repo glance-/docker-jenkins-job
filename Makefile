@@ -7,11 +7,17 @@ TAGGINGS=$(foreach name,$(NAMES),-t $(name))
 NO_CACHE=--no-cache=false
 # Subprojects
 EXTRA_JOBS=$(patsubst %/$(DOCKERFILE),%,$(wildcard */$(DOCKERFILE)))
+PULL=
 
 all: build push
 all_extra_job: build push build_extra_jobs push_extra_jobs
+
+pull:
+	$(eval PULL=--pull)
+
 build:
-	docker build -f $(DOCKERFILE) $(NO_CACHE) $(TAGGINGS) .
+	docker build -f $(DOCKERFILE) $(PULL) $(NO_CACHE) $(TAGGINGS) .
+
 update: NO_CACHE=
 update: build
 
@@ -31,7 +37,7 @@ docker.sunet.se/%:
 	@# and then we can match out the "job-name"
 	@# so we can use that to figure out which context directory to use
 	$(eval extra_job=$(patsubst docker.sunet.se/sunet/docker-jenkins-%-job,%,$(patsubst %:$(lastword $(subst :, ,$@)),%,$@)))
-	docker build -f $(extra_job)/$(DOCKERFILE) $(NO_CACHE) -t $(image_name) $(extra_job)
+	docker build -f $(extra_job)/$(DOCKERFILE) $(PULL) $(NO_CACHE) -t $(image_name) $(extra_job)
 
 build_extra_jobs: $(foreach extra_job,$(EXTRA_JOBS),docker.sunet.se/sunet/docker-jenkins-$(extra_job)-job\:$(VERSION))
 
