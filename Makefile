@@ -2,7 +2,7 @@ VERSION=latest
 NAME=jenkins-job
 DOCKERFILE=Dockerfile
 # This is used with so many different names...
-NAMES=docker.sunet.se/$(NAME)\:$(VERSION) docker.sunet.se/sunet/$(NAME)\:$(VERSION) docker.sunet.se/sunet/docker-$(NAME)\:$(VERSION)
+NAMES=docker.sunet.se/sunet/docker-$(NAME)\:$(VERSION)
 TAGGINGS=$(foreach name,$(NAMES),-t $(name))
 NO_CACHE=--no-cache=false
 # Subprojects
