@@ -1,4 +1,0 @@
-ARG SOURCE_IMAGE=docker.sunet.se/jenkins-job
-FROM $SOURCE_IMAGE
-# Hack out docker push
-COPY --chown=root:root docker-push-wrapper /usr/local/bin/docker
