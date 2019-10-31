@@ -21,6 +21,9 @@ build:
 update: NO_CACHE=
 update: build
 
+clean:
+	docker rmi $(NAMES)
+
 # There's some directory search magic going on in make,
 # thats why the part up to the first / is left here.
 push_docker.sunet.se/%:
@@ -45,3 +48,6 @@ update_extra_jobs: NO_CACHE=
 update_extra_jobs: build_extra_jobs
 
 push_extra_jobs: $(foreach extra_job,$(EXTRA_JOBS),push_docker.sunet.se/sunet/docker-jenkins-$(extra_job)-job\:$(VERSION))
+
+clean_extra_jobs:
+	docker rmi $(subst xenial-job,job-xenial,$(foreach extra_job,$(EXTRA_JOBS),docker.sunet.se/sunet/docker-jenkins-$(extra_job)-job\:$(VERSION)))
